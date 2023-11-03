@@ -5,7 +5,10 @@
 player = {
     'health': 100,
     'attack': 10,
-    'defense': 5
+    'defense': 5,
+    # Try adding in XP and levels! Will also need a key with the value being the amount of XP needed to level up.
+    'gold': 100,
+    'inventory': [] #Contains a list of items
 }
 # A dictionary representing the player's attributes
 enemy = {
@@ -16,22 +19,50 @@ enemy = {
     'alive': True
 }
 
+# Example items, try adding more items!
+health_potion = {'name': 'Health Potion', 'type': 'heal', 'value': 20, 'cost': 30}
+
+# Shop inventory, try creating a shop room! (Hint: still a 'key' : value pair)
+shop_inventory = [health_potion, attack_boost]
+
 # Define a dictionary of rooms in the game, each with descriptions and exits
+# Use a flow chart site like https://www.lucidchart.com/ to have a clear idea of your rooms layout
 rooms = {
     'start': {
         'description': 'You are in the starting room. There\'s a door to the north.',
         'exits': {'north': 'hallway'}
     },
     'hallway': {
-        'description': 'You are in a long hallway. There are doors to the north and south.',
-        'exits': {'south': 'start', 'north': 'treasure'},
-        'enemy': enemy # Reference to the enemy in this room
+        'description':
+        'You are in a long hallway. There are doors to the north and south.',
+        'exits': {
+            'south': 'start',
+            'north': 'hallwaytwo'
+        },
+        'enemy': enemy
+    },
+    'hallwaytwo': {
+        'description':
+        'You are in a long hallway. There are doors to the north and south.',
+        'exits': {
+            'south': 'hallway',
+            'north': 'treasure',
+        },
+        # Another way to implement enemies into the game without declaring a variable earlier
+        'enemy': {
+          'name': 'Orc',
+          'health': 30,
+          'attack': 10,
+          'defense': 2,
+          'alive': True
+      }
     },
     'treasure': {
         'description': 'Congratulations! You found the treasure room!',
         'exits': {'south': 'hallway'}
     },
 }
+
 # Combat function that takes player and enemy dictionaries as parameters
 def combat(player, enemy):
 # The fight continues as long as both have more than 0 health
@@ -41,7 +72,9 @@ def combat(player, enemy):
 
       # If the player chooses to attack, calculate damage and update the enemy's health
       if action == 'attack':
+          # We use the max() function in case the player's attack is somehow less than the enemy's defense.
           damage = max(0, player['attack'] - enemy['defense'])
+          # Deal damage to the enemy's health
           enemy['health'] -= damage
           print(f"You dealt {damage} damage to the {enemy['name']}!")
 
@@ -49,6 +82,8 @@ def combat(player, enemy):
           if enemy['health'] <= 0:
               enemy['alive'] = False
               print(f"You defeated the {enemy['name']}!")
+              #Add to XP however much XP this enemy is worth
+              check_level_up(player)
               break # Exit the combat loop if the enemy is defeated
 
       # If the player didn't choose to defend, calculate the full damage from the enemy's attack
@@ -65,12 +100,23 @@ def combat(player, enemy):
       # Check if the player has been defeated
       if player['health'] <= 0:
           print("You have been defeated!")
-          break # Exit the combat loop if player is defeated
+          break # Exit the combat loop if the player is defeated
 
       # Show current health statuses after the round of combat
       health_status = f"Your health: {player['health']},"
       enemy_status = f"{enemy['name']} health: {enemy['health']}"
       print(health_status, enemy_status)
+      
+# Levels the player up and increases their stats
+def check_level_up(player):
+  if player['xp'] >= player['xp_to_level']:
+    player['level'] += 1
+    player['xp'] = 0  # Reset XP
+    player['xp_to_level'] *= 2  # Increase XP needed for next level
+    player['health'] += 20 # Increase player stats
+    player['attack'] += 5
+    player['defense'] += 5
+    print(f"You've leveled up to level {player['level']}!")
 
 # Initialize the current_room variable to the starting room
 current_room = 'start'
@@ -79,6 +125,8 @@ current_room = 'start'
 while True:
     # Print the description of the current room
     print(rooms[current_room]['description'])
+
+    # Todo: Add shop logic
 
     #Check if there's an enemy in the current room and if it's alive
     if 'enemy' in rooms[current_room] and rooms[current_room]['enemy']['alive']:
