@@ -19,6 +19,21 @@ enemy = {
     'alive': True
 }
 
+# Define an NPC with a quest
+npc = {
+    'name': 'Old Wizard',
+    'dialogue': 'Greetings, traveler! The cursed goblins have stolen my magic scroll. Can you retrieve it for me?',
+    'quest': {
+        'description': 'Retrieve the magic scroll from the goblins.',
+        'completed': False
+    },
+    'reward': {
+        'xp': 100,
+        'items': [{'name': 'Magic Wand', 'type': 'attack', 'value': 5, 'cost': 100}],
+        'gold': 50
+    }
+}
+
 # Example items, try adding more items!
 health_potion = {'name': 'Health Potion', 'type': 'heal', 'value': 20, 'cost': 30}
 
@@ -40,6 +55,12 @@ rooms = {
             'north': 'hallwaytwo'
         },
         'enemy': enemy
+    },
+    # Define a room with an NPC
+    rooms['wizard_hut'] = {
+        'description': 'An old wizard appears to be in deep thought here.',
+        'npc': npc
+        # Add in exits
     },
     'hallwaytwo': {
         'description':
@@ -127,6 +148,18 @@ while True:
     print(rooms[current_room]['description'])
 
     # Todo: Add shop logic
+
+    # Check if there is an NPC in the room
+    if 'npc' in rooms[current_room]:
+        print(f"You see {rooms[current_room]['npc']['name']}.")
+        action = input('Do you want to "talk" to the NPC or "leave"? ')
+    
+        if action == 'talk':
+            print(rooms[current_room]['npc']['dialogue'])
+            quest_action = input('Will you "accept" the quest? (yes/no) ')
+            if quest_action == 'yes':
+                player['quest'] = rooms[current_room]['npc']['quest']
+                print(f"Quest accepted: {player['quest']['description']}")
 
     #Check if there's an enemy in the current room and if it's alive
     if 'enemy' in rooms[current_room] and rooms[current_room]['enemy']['alive']:
