@@ -153,7 +153,18 @@ while True:
     if 'npc' in rooms[current_room]:
         print(f"You see {rooms[current_room]['npc']['name']}.")
         action = input('Do you want to "talk" to the NPC or "leave"? ')
-    
+
+        # After enemy defeat
+        if 'quest' in player and not player['quest']['completed']:
+            # Check if the conditions are met (e.g., a specific enemy was defeated)
+            player['quest']['completed'] = True
+            print("You have completed the quest!")
+            
+            # Grant quest rewards
+            player['xp'] += npc['reward']['xp']
+            player['gold'] += npc['reward']['gold']
+            player['inventory'].extend(npc['reward']['items'])
+        
         if action == 'talk':
             print(rooms[current_room]['npc']['dialogue'])
             quest_action = input('Will you "accept" the quest? (yes/no) ')
