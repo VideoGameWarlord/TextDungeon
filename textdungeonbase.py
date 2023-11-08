@@ -57,7 +57,7 @@ rooms = {
         'enemy': enemy
     },
     # Define a room with an NPC
-    rooms['wizard_hut'] = {
+    'wizard_hut' : {
         'description': 'An old wizard appears to be in deep thought here.',
         'npc': npc
         # Add in exits
