@@ -1,16 +1,11 @@
 # Plenty of resources on Google but here's one, explore around in it a bit!
 # Contains plenty of information on Python, link is specifically to dictionaries that we are using.
 # https://www.w3schools.com/python/python_dictionaries.asp
-# A dictionary {key : value} representing the player's attributes
-player = {
-    'health': 100,
-    'attack': 10,
-    'defense': 5,
-    # Try adding in XP and levels! Will also need a key with the value being the amount of XP needed to level up.
-    'gold': 100,
-    'inventory': [] #Contains a list of items
-}
-# A dictionary representing the player's attributes
+# A dictionary is variable = {key : value}
+
+import pickle
+import random
+
 enemy = {
     'name': 'Goblin',
     'health': 20,
@@ -93,7 +88,7 @@ def combat(player, enemy):
 
       # If the player chooses to attack, calculate damage and update the enemy's health
       if action == 'attack':
-          # We use the max() function in case the player's attack is somehow less than the enemy's defense.
+          # We use the max() function in case the player's attack is less than the enemy's defense.
           damage = max(0, player['attack'] - enemy['defense'])
           # Deal damage to the enemy's health
           enemy['health'] -= damage
@@ -139,8 +134,62 @@ def check_level_up(player):
     player['defense'] += 5
     print(f"You've leveled up to level {player['level']}!")
 
-# Initialize the current_room variable to the starting room
-current_room = 'start'
+player = {}
+
+# The initialize_player function should create a new player dictionary with default values
+def initialize_player():
+  # Set up the default player data, a dictionary representing the player's attributes
+  return {
+      'health': 100,
+      'attack': 10,
+      'defense': 5,
+      # Try adding in XP and levels! Will also need a key with the value being the amount of XP needed to level up.
+      'gold': 100,
+      'inventory': [], #Contains a list of items
+      'attack_boost_duration': 0
+  }
+
+def initialize_game():
+  action = input('Would you like to "load" a game or "start" a new one? ')
+  if action == 'load':
+    return load_game(
+    )  # This will either return a valid game state or (None, '')
+  else:
+    # If starting a new game or if loading failed, initialize player
+    print('Starting a new game...')
+    return initialize_player(
+    ), 'start'  # Replace with actual player initialization
+
+file_path = 'textrpg.pickle'
+
+def save_game(player, current_room):
+  try:
+    with open(file_path, 'wb') as file:
+      game_state = {'player': player, 'current_room': current_room}
+      pickle.dump(game_state, file)
+      print('Game saved succesfully!')
+  except Exception as e:
+    print(f"An error occurred while saving the game: {e}")
+
+
+def load_game():
+  try:
+    with open(file_path, 'rb') as file:
+      game_state = pickle.load(file)
+      player = game_state['player']
+      current_room = game_state['current_room']
+      return player, current_room
+  except FileNotFoundError:
+    print("No saved game found.")
+    return None, ''
+
+# Initialize the game (either load a saved game or start a new one)
+player, current_room = initialize_game()
+
+# Check if player is None, which indicates loading failed or a new game should be started
+if player is None:
+  player = initialize_player()  # Make sure this function returns a valid player dictionary
+  current_room = 'start'
 
 # Start the main game loop
 while True:
@@ -192,3 +241,7 @@ while True:
     # Handle the case where the player inputs an invalid direction
     else:
         print('Invalid direction.')
+
+    # Instead of picking a direction, just type 'save' to save the game.
+    if (action == 'save'):
+        save_game(player, current_room)
