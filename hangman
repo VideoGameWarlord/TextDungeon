@@ -1,0 +1,52 @@
+import random
+#create a new file called wordlist.txt by clicking the plus sign. Then copy and paste a wordlist from google
+f = open("wordlist.txt","r")
+wordlist = f.read().splitlines()
+win_word = random.choice(wordlist)
+
+#print(win_word)
+blanks = []
+for letter in win_word:
+  blanks.append("_")
+
+lives = ['❤️','❤️','❤️','❤️','❤️','❤️']
+wrong_letters = []
+correct_let = 0
+
+print("Welcome to WORD GUESS!")
+while True:
+  print("\n"*100)
+  print("Lives:", end = " ")
+  for heart in lives:
+    print(heart ,end = " ") 
+
+  if len(lives) == 0:
+    print("0\nGame Over!")
+    print("The correct answer was", )
+    break
+
+  print()
+  print("* "*(len(win_word)+2))
+  print("*", end = " ")
+  for blank in blanks:
+    print(blank , end = " ")
+  # What would we put here to close the box?
+
+  print("\nWrong Guesses: ", )
+  print("What is your guess?")
+  guess = # What are we going to ask the player for?
+  if len(guess)>1 and guess == win_word:
+    print("You Won!")
+    break
+  elif len(guess) == 1 and guess in win_word and guess not in blanks:
+    for spot in range(len(win_word)):
+      if guess == win_word[spot]:
+        blanks[spot] = guess
+        # What var do we increase here? += 1
+  elif guess not in blanks:
+    lives = # Reduce lives by one [:-1]
+    wrong_letters.append(# What var do we use to add to this list?)
+
+  if correct_let == len(win_word):
+    print("You win!")
+    break
