@@ -83,6 +83,7 @@ rooms = {
         'description': 'Rows upon rows of ancient books surround you.',
         'exits': {
             'east': 'hallway',
+            'south': 'hidden_chamber'
         },
         'enemy': {
             'name': 'Cursed Librarian',
@@ -90,6 +91,13 @@ rooms = {
             'attack': 12,
             'defense': 8,
             'alive': True
+        }
+    },
+        'hidden_chamber' : {
+        'description': 'A mysterious chamber filled with ancient artifacts.',
+        'revealed': False,  # Initially, the room is not revealed
+        'exits': {
+            'north': 'library',
         }
     },
     'shop': {
@@ -164,12 +172,13 @@ rooms = {
 
 def combat(player, enemy):
   while player['health'] > 0 and enemy['health'] > 0:
+    print()
     action = input('Do you want to "attack", "defend", or "run"? ')
 
     if action == 'attack' or action == 'a':
       damage = max(0, player['attack'] - enemy['defense'])
       enemy['health'] -= damage
-      print(f"You dealt {damage} damage to the {enemy['name']}!")
+      print(f"You dealt {damage} damage to the {enemy['name']}!\n")
 
       if enemy['health'] <= 0:
         enemy['alive'] = False
@@ -190,7 +199,7 @@ def combat(player, enemy):
           player['inventory'].append(loot_item)
           print(f"The enemy dropped a {loot_item['name']}.")
 
-        player['xp'] += 50  # or however much XP this enemy is worth
+        player['xp'] += 500  # or however much XP this enemy is worth
         print(f"You gained {player['xp']} XP.")
         check_level_up(player)
         break
@@ -217,15 +226,33 @@ def combat(player, enemy):
 
 
 def check_level_up(player):
-  if player['xp'] >= player['xp_to_level']:
+  while (player['xp'] >= player['xp_to_level']):
     player['level'] += 1
-    player['xp'] = 0  # Reset XP
+    player['xp'] -= player['xp_to_level']  # Subtract XP
     player['xp_to_level'] *= 2  # Increase XP needed for next level
     player['health'] += 20
     player['attack'] += 5
     print(f"You've leveled up to level {player['level']}!")
 
+    print()
 
+def complete_quest(player, npc_id):
+  # Need to fix
+  #npc = npcs[npc_id]
+  if player['quest']['objective'] == npc['quest']['objective']:
+      npc['quest']['completed'] = True
+      print(f"Quest completed: {npc['quest']['description']}")
+      player['xp'] += npc['reward']['xp']
+      player['gold'] += npc['reward']['gold']
+      player['inventory'].extend(npc['reward']['items'])
+      # Optionally, reset or remove the quest from the player
+
+def check_for_secret_room(player, current_room):
+  if current_room == 'library' and 'ancient_key' in player['inventory']:
+      rooms['hidden_chamber']['revealed'] = True
+      print("A section of the wall slides away, revealing a hidden chamber!")
+
+# Starting to load the game
 player = {}
 
 # The initialize_player function should create a new player dictionary with default values
@@ -304,7 +331,10 @@ def display_inventory():
     print("Your inventory is empty.")
   else:
     print("Your inventory:")
-    
+    for item in player['inventory']:
+      for key, value in item.items():
+        if key == 'name':
+          print(f"{key}: {value}")
 
 # Main Game Loop
 while True:
@@ -312,6 +342,13 @@ while True:
 
   # Print exits of the current room
   print("Exits:")
+  for exit in rooms[current_room]['exits']:
+    print(f"- {exit}")
+
+  print()
+
+  # Check for any secret rooms
+  check_for_secret_room(player, current_room)
 
   # Check if there is an NPC in the room
   if 'npc' in rooms[current_room]:
