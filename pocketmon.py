@@ -92,6 +92,19 @@ def heal(attacker, _):
   attacker.health = min(attacker.health + heal_amount, attacker.max_health)
   return (heal_amount, 'heal')  # Return a tuple (amount, action type)
 
+class Monster:
+    def __init__(self, name, health, strength, defense, type, weakness):
+        self.name = name
+        self.health = health
+        self.strength = strength
+        self.defense = defense
+        self.type = type
+        self.weakness = weakness
+        self.defense_up = False  # Indicates if the defense is raised
+        self.defense_turns = 0  # Number of turns the defense is up
+        self.stunned = False  # Indicates if the monster is stunned
+
+
 monster_templates = {
     'Flamey': {
         'type': 'Fire',
@@ -111,7 +124,7 @@ monster_templates = {
         'evolution_level': None,
         'evolution': None
     },
-  
+
     'Pinne Fawn': {
         'type': 'Grass',
         'base_strength': 15,
@@ -130,7 +143,7 @@ monster_templates = {
         'evolution_level': None,
         'evolution': None
     },
-  
+
     'Lesser Freezeguin': {
         'type': 'Ice',
         'base_strength': 10,
@@ -212,7 +225,7 @@ class Monster:
     if random.random() < dodge_chance:
         print(f"{target.name} dodged the attack!")
         return 0
-    
+
     base_damage = random.randint(0, self.strength)
     multiplier = 1
 
@@ -336,7 +349,7 @@ class Player:
                       print(f"{player_monster.name} used {ability_name}, stunning {wild_monster.name}.")
                     elif action_type == 'defense':
                       print(f"{player_monster.name} used {ability_name}, defending against {wild_monster.name}'s next attack.")
-                      
+
             elif choice == 'catch':
               # If the player can catch the monster, it will be added to their inventory.
               if player.catch_monster(map[current_room]['monster']):
@@ -471,7 +484,7 @@ while player.health > 0:
     print(f"- {exit_direction}")
 
   print()
-  
+
   # Move to another room
   direction = input("Which direction do you want to go? ").lower()
   if direction in map[current_room]['exits']:
